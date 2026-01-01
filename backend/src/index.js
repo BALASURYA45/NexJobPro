@@ -31,13 +31,27 @@ app.use(helmet());
 app.use(morgan('dev'));
 
 // Mount routers
-app.use('/api/auth', authRoutes);
+const apiRouter = express.Router();
+app.use('/api', apiRouter);
+
+apiRouter.use('/auth', authRoutes);
+apiRouter.use('/jobs', jobRoutes);
+apiRouter.use('/applications', applicationRoutes);
+apiRouter.use('/ai', aiRoutes);
+
+// Fallback for /api routes to handle potential routing issues
 app.use('/api/jobs', jobRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/ai', aiRoutes);
 
 app.get('/', (req, res) => {
   res.send('Job Board API is running...');
+});
+
+// Add a health check route at the root for Vercel
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok', message: 'API is healthy' });
 });
 
 // Error Handling Middleware
@@ -52,10 +66,12 @@ app.use((err, req, res, next) => {
   });
 });
 
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
 
 module.exports = app;
