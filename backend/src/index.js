@@ -71,10 +71,11 @@ app.use((err, req, res, next) => {
   });
 });
 
-// For local development
-if (process.env.NODE_ENV !== 'production') {
-  const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => {
+// Start server
+const PORT = process.env.PORT || 5000;
+// Note: Vercel handles the app export, but Render/Heroku need app.listen
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on port ${PORT}`);
   });
 }
