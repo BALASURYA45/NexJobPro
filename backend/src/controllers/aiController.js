@@ -102,27 +102,38 @@ const analyzeResume = async (req, res, next) => {
     }
 
     // Technology check
-    const techStack = ['react', 'node', 'javascript', 'python', 'java', 'sql', 'aws', 'docker', 'typescript', 'mongodb', 'html', 'css', 'git', 'rest api'];
-    let techCount = 0;
+    const techStack = ['react', 'node', 'javascript', 'python', 'java', 'sql', 'aws', 'docker', 'typescript', 'mongodb', 'html', 'css', 'git', 'rest api', 'express', 'next.js', 'vue', 'angular', 'redux', 'tailwind', 'bootstrap', 'postgresql', 'mysql', 'redis', 'firebase', 'kubernetes', 'jenkins', 'ci/cd', 'jest', 'cypress'];
+    const detectedSkills = [];
     techStack.forEach(t => {
-      if (text.includes(t)) techCount++;
+      if (text.includes(t)) {
+        detectedSkills.push(t.toUpperCase());
+      }
     });
     
-    score += Math.min(techCount * 3, 25);
+    score += Math.min(detectedSkills.length * 4, 30);
     score = Math.min(score, 100);
 
     let status = 'Weak';
     let feedback = '';
+    const suggestions = [];
 
     if (score >= 80) {
       status = 'Strong';
       feedback = 'Excellent resume! It is well-structured and contains industry-standard keywords.';
+      suggestions.push('Consider adding links to your live projects or GitHub repositories.');
+      suggestions.push('Ensure your bullet points start with strong action verbs.');
     } else if (score >= 60) {
       status = 'Moderate';
       feedback = 'Good resume, but could be improved by adding more specific technical skills or project details.';
+      suggestions.push('Highlight your specific contributions in each role using quantifiable metrics.');
+      suggestions.push('Add a dedicated "Projects" section to showcase your practical experience.');
+      suggestions.push('Expand your skills section with more modern framework proficiencies.');
     } else {
       status = 'Weak';
       feedback = 'Your resume is missing critical sections. Consider using a professional template and adding more technical details.';
+      suggestions.push('Add missing standard sections like "Projects", "Certifications", or a "Professional Summary".');
+      suggestions.push('Incorporate more technical keywords related to your target job roles.');
+      suggestions.push('Format your resume to be more ATS-friendly with clear headers.');
     }
 
     res.json({
@@ -132,7 +143,9 @@ const analyzeResume = async (req, res, next) => {
       metadata: {
         pages: pageCount,
         words: text.split(/\s+/).filter(w => w.length > 0).length,
-        foundSections
+        foundSections,
+        skills: detectedSkills,
+        suggestions
       }
     });
 
