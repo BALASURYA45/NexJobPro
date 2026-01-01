@@ -24,7 +24,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: [
+    process.env.CLIENT_URL,
+    'http://localhost:5173',
+    'https://nexjobpro.vercel.app', // Adding likely Vercel URL
+    /\.vercel\.app$/ // Allow any Vercel preview deployment
+  ].filter(Boolean),
   credentials: true
 }));
 app.use(helmet());
